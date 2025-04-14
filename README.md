@@ -28,7 +28,7 @@ program or code for k-means. This will give you 10 centroid vectors.
 the highest feature values)  
 
 
-### Thanks to
+### Acknowledgements
 #### Dataset
 * [Yelp Dataset](https://www.yelp.com/dataset)
 
@@ -63,7 +63,7 @@ These are the python libraries that you need to install first.
 
 _Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
 
-1. Download dataset at [Yelp Dataset](https://www.yelp.com/dataset) and put it in `dataset/` path.
+1. Download dataset at [Yelp Dataset](https://www.yelp.com/dataset) and put it in `dataset/` 
 2.  Enjoy!
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

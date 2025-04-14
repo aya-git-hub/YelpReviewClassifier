@@ -3,19 +3,18 @@
 import json
 from collections import Counter
 
-# stop words are words that occur very frequently,
-# and that don't seem to carry information
-# about the quality of the review.
-# we decide to keep 'not', for example, as negation is an important info.
-# I also keep ! which I think might be more frequent in negative reviews, and which is
-# typically used to make a statement stronger (in good or in bad).
-# the period, on the other hand, can probably be considered neutral
-# this could have been done at a later stage as well,
-# but we can do it here as this stage is fast
+'''stop words are words that occur very frequently,
+and that don't seem to carry information
+about the quality of the review.
+we decide to keep 'not', for example, as negation is an important info.
+I also keep ! which I think might be more frequent in negative reviews, and which is
+typically used to make a statement stronger (in good or in bad).
+the period, on the other hand, can probably be considered neutral
+this could have been done at a later stage as well,
+but we can do it here as this stage is fast'''
 def load_stopwords(filepath):
     """
-    从指定文件中加载停用词，并返回一个集合。
-    每一行文件包含一个停用词，如果文件中有空行或注释（以#开头）则会跳过。
+    load stopwords from a file
     """
     stopwords = set()
     with open(filepath, 'r', encoding='utf-8') as f:
