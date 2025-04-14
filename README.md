@@ -63,7 +63,7 @@ These are the python libraries that you need to install first.
 
 _Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
 
-1. Download dataset at [Yelp Dataset]((https://www.yelp.com/dataset))
+1. Download dataset at [Yelp Dataset](https://www.yelp.com/dataset) and put it in `dataset/` path.
 2.  Enjoy!
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
