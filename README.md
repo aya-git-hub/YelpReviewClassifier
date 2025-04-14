@@ -1,4 +1,6 @@
+<a id="readme-top"></a>
 
+<h1 align="center">Yelp Review Classifier</h1>
 
 ### Name:Yuao Ai  
 ### SUID: 258527763
@@ -7,7 +9,7 @@
 
 
 <!-- ABOUT THE PROJECT -->
-## About The Homework
+## About The Project
 
 
 
@@ -26,9 +28,12 @@ program or code for k-means. This will give you 10 centroid vectors.
 the highest feature values)  
 
 
+### Thanks to
+#### Dataset
+* [Yelp Dataset](https://www.yelp.com/dataset)
 
-
-
+#### Preprocessing
+* [Text Preprocessing Blog](https://thedatafrog.com/en/articles/text-preprocessing-machine-learning-yelp/)
 
 
 <!-- GETTING STARTED -->
@@ -44,7 +49,7 @@ These are the python libraries that you need to install first.
   ```sh
     pip install tables
   ```
-#### * Downgrade numpy to a compatible version.
+#### * Downgrade numpy to a compatible version
   ```sh
     pip install numpy==1.23.5
   ```
@@ -54,6 +59,13 @@ These are the python libraries that you need to install first.
   ```
   Assume you have already installed Python 3.6+ and pip. If not, please install them first.
 
+### Installation
+
+_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+
+1. Download dataset at [Yelp Dataset]((https://www.yelp.com/dataset))
+2.  Enjoy!
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
 ### One step using a Makefile  
@@ -78,36 +90,8 @@ It will delete all .txt and .npz files.
 ### Execute step by step
 Of course, you can also complete this task step by step.
 ##### 1.Get Tokenized dataset:
-  ```sh
-    python Tokenize.py -d "dataset" 'yelp_review.json' -p 
-  ```
-You will get tokenize  dataset after  a  long time.
-##### 2.Building the vocabulary:
-  ```sh
-    python  VocabularyBuilder.py -d "dataset" 'yelp_review_tok.json' -p
-  ```
-You will get "clean_words.txt" which was without stopwords in "results/"
-##### 3.Count the number of times:
-  ```sh
-    python3 Count.py
-  ```
-You will get top 500 words and their counts in 
-"results/top_500_words.txt, results/top_500_words_with_frequencies.txt"
-##### 4.Vectorize all reviews:
-  ```sh
-    python3 ReviewVectorizer.py
-  ```
-It will generate "vectorized_reviews.npz" 
-##### 5.Cluster the vectorized reviews:
-  ```sh
-    python3 ReviewClusters.py
-  ```
-It will generate 10 centroids and their feature values
-in "results/centroids"
-##### 6.select the top 5 words:
-  ```sh
-    python3 ClusterWordsGenerator.py
-  ```
+
+  
 Finally, get the top 5 words representing each cluster 
 and their feature values in "results/top_5_centroids.txt"
 ## Submitted files
