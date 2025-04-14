@@ -89,11 +89,19 @@ It will delete all .txt and .npz files.
 
 ### Execute step by step
 Of course, you can also complete this task step by step.
-##### 1.Get Tokenized dataset:
-
-  
-Finally, get the top 5 words representing each cluster 
-and their feature values in "results/top_5_centroids.txt"
+##### 1. Get Tokenized dataset:
+ ```sh
+  python Tokenize.py -d "dataset" 'yelp_review.json' -l 1000000
+ ```  
+This takes only one input file, yelp_review.json, and reads 1000000 lines from this file in a single process.  
+#### 2. Build the vocabulary
+  ```sh
+  python VocabularyBuilder.py -d "dataset" 'yelp_review_tok.json' -p 
+  ```
+#### 3. echo...
+  ```sh
+  echo "Building the vocabulary..."
+  ```
 ## Submitted files
 The files that are needed to submit are in "results/"
 <table>
