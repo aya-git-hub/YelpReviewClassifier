@@ -1,0 +1,37 @@
+# created by virtualenv automatically
+
+# Python 编译生成的文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境目录（忽略所有虚拟环境相关的文件夹）
+venv/
+ENV/
+env/
+.venv/
+.env/
+
+# 构建、打包生成的目录和文件
+build/
+dist/
+*.egg-info/
+
+# 日志和临时文件
+*.log
+*.json
+
+# 单元测试、覆盖率、临时数据文件
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+# 编辑器和 IDE 相关的文件（可选）
+.idea/
+.vscode/
+
+# Mac OS 系统文件（若在 macOS 上开发）
+.DS_Store
