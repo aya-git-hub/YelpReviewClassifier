@@ -28,12 +28,12 @@ program or code for k-means. This will give you 10 centroid vectors.
 the highest feature values)  
 
 
-### Acknowledgements
+### Acknowledgements and References
 #### Dataset
 * [Yelp Dataset](https://www.yelp.com/dataset)
 
 #### Preprocessing
-* [Text Preprocessing Blog](https://thedatafrog.com/en/articles/text-preprocessing-machine-learning-yelp/)
+* [Text Preprocessing Blog](https://thedatafrog.com/en/articles/text-preprocessing-machine-learning-yelp/) form Colin Bernet
 
 
 <!-- GETTING STARTED -->
@@ -45,7 +45,7 @@ This is a guide of how to set up my project locally.
 ### Prerequisites
 
 These are the python libraries that you need to install first.
-#### * PyTables
+#### * pytables
   ```sh
     pip install tables
   ```
@@ -53,10 +53,24 @@ These are the python libraries that you need to install first.
   ```sh
     pip install numpy==1.23.5
   ```
-#### * Pandas
+#### * pandas
   ```sh
     pip install pandas
   ```
+#### * nltk
+  ```sh
+    pip install nltk
+  ```
+
+#### * h5py
+  ```sh
+    pip install h5py
+  ```
+#### * sklearn
+  ```sh
+    pip install scikit-learn
+  ```
+
   Assume you have already installed Python 3.6+ and pip. If not, please install them first.
 
 ### Installation
@@ -89,18 +103,44 @@ It will delete all .txt and .npz files.
 
 ### Execute step by step
 Of course, you can also complete this task step by step.
-##### 1. Get Tokenized dataset:
+#### 1. Get Tokenized dataset:
+**For all dataset:**
  ```sh
   python Tokenize.py -d "dataset" 'yelp_review.json' -l 1000000
  ```  
+**For training set:**
+ ```sh
+  python Tokenize.py -d "dataset" 'yelp_useful.json' -l 500000
+ ```  
+
 This takes only one input file, yelp_review.json, and reads 1000000 lines from this file in a single process.  
 #### 2. Build the vocabulary
+**For all dataset:**
   ```sh
   python VocabularyBuilder.py -d "dataset" 'yelp_review_tok.json' -p 
   ```
-#### 3. echo...
+**For training dataset:**
   ```sh
-  echo "Building the vocabulary..."
+  python VocabularyBuilder.py -d "dataset" 'yelp_useful_tok.json' -p 
+  ```
+#### 3. Encode the dataset
+**For all dataset:**
+  ```sh
+  python Encoder.py -d "dataset" 'yelp_review_tok.json' -p 
+  ```
+**For training dataset:**
+  ```sh
+  python Encoder.py -d "dataset" 'yelp_useful_tok.json' -p 
+  ```
+This step will generate encoded files for each review token.
+#### 4. Converte the encoded dataset to a numpy array
+**For all dataset:**
+  ```sh
+  python NpArrayConverter.py  -d "dataset" 'yelp_review_tok_enc.json'  
+  ```
+**For training dataset:**
+  ```sh
+  python NpArrayConverter.py  -d "dataset" 'yelp_useful_tok_enc.json'  
   ```
 ## Submitted files
 The files that are needed to submit are in "results/"

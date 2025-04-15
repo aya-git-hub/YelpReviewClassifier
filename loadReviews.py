@@ -1,8 +1,7 @@
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
-
-# open input file:
+from Vocabulary import Vocabulary# open input file:
 ifile = open('dataset/yelp_review.json', encoding='utf-8')
 
 # read the first 100k entries

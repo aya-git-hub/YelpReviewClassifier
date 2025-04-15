@@ -30,7 +30,7 @@ stopwords = load_stopwords("stopwords.txt")
 
 
 
-def process_file(fname, options):
+def process_file(fname, options) -> Counter:
     '''process a review JSLON lines file and count the occurence
     of each words in all reviews.
     returns the counter, which will be used to find the most frequent words
