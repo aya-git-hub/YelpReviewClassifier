@@ -452,7 +452,6 @@ shed
 she'll
 shes
 should
-shouldn't
 show
 showed
 shown
@@ -492,7 +491,6 @@ such
 sufficiently
 suggest
 sup
-sure	t
 take
 taken
 taking
@@ -641,12 +639,10 @@ willing
 wish
 with
 within
-without
 wont
 words
 world
 would
-wouldnt
 www
 x
 y
@@ -660,6 +656,5 @@ youre
 yours
 yourself
 yourselves
-you've
 z
 zero

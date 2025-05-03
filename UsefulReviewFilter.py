@@ -6,9 +6,9 @@ import sys
 
 class UsefulReviewFilter:
     """
+    Assume a useful review's useful + funny + cool is more than 5.
     This class reads a JSON file (with one JSON record per line),
-    filters out reviews where useful + funny + cool is less than 3,
-    and writes only the first 1,000,000 valid reviews to an output file.
+    filters out reviews and writes only the first 100000 useful reviews to an output file.
     """
 
     def __init__(self, filepath):
@@ -62,7 +62,7 @@ class UsefulReviewFilter:
 
 def main():
     if len(sys.argv) != 3:
-        print("Usage: python3 UsefulReviewFilter.py <path> <json file name>")
+        print("Usage: python UsefulReviewFilter.py <path> <json file name>")
         sys.exit(1)
 
     # Construct full path of the input file.

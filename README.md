@@ -14,18 +14,9 @@
 
 
 #### Perform the following: 
-• Identify all the unique words that appear in the “review/text” field of the reviews. Denote
-the set of such words as L.  
-• Remove from L all stopwords in “Long Stopword List” from http://www.ranks.nl/
-stopwords. Denote the cleaned set as W.  
-• Count the number of times each word in W appears among all reviews (“review/text” field)
-and identify the top 500 words.  
-• Vectorize all reviews (“review/text” field) using these 500 words (see an example of vector-
-ization here: https://medium.com/data-science/understanding-nlp-word-embeddings-text-vectorization-1a23744f7223).  
-• Cluster the vectorized reviews into 10 clusters using k-means. You are allowed to use any
-program or code for k-means. This will give you 10 centroid vectors.  
-• From each centroid, select the top 5 words that represent the centroid (i.e., the words with
-the highest feature values)  
+The flowchart for my project is shown below.  
+
+![flowchart](./material/pictures/ProjectWorkflow.png "ProjectWorkflow")
 
 
 ### Acknowledgements and References
@@ -82,91 +73,109 @@ _Below is an example of how you can instruct your audience on installing and set
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Usage
-### One step using a Makefile  
-*Make sure you have installed make.*  
-
-In this homework, I wrote a Makefile for running. Feel free to use it!
-#### * Use make
-  ```sh
-    make
-  ```
-And then, you can find the answer in "results/"
-
-#### * Clean the text
-This task generates a lot of text files, which occupy significant space in your disk, 
-but we can remove them all at once.
-  ```sh
-    make clean
-  ```
-It will delete all .txt and .npz files.  
-
+For this project, I originally planned to write a Makefile to complete everything in one step.
+However, considering the Windows platform and the differences in commands, that approach proved difficult.
+Nevertheless, you can still complete the process step by step by following the instructions below.
 
 ### Execute step by step
 Of course, you can also complete this task step by step.
 #### 1. Get Tokenized dataset:
-**For all dataset:**
+**1.1 For all dataset:**
  ```sh
   python Tokenize.py -d "dataset" 'yelp_review.json' -l 1000000
  ```  
-**For training set:**
+This takes only one input file, yelp_review.json, and reads 1000000 lines from this file in a single process.     
+
+**1.2 For training set:**
  ```sh
   python Tokenize.py -d "dataset" 'yelp_useful.json' -l 500000
- ```  
+ ```
 
-This takes only one input file, yelp_review.json, and reads 1000000 lines from this file in a single process.  
+
 #### 2. Build the vocabulary
-**For all dataset:**
+**2.1 For all dataset:**
   ```sh
   python VocabularyBuilder.py -d "dataset" 'yelp_review_tok.json' -p 
   ```
-**For training dataset:**
+**2.2 For training dataset:**
   ```sh
   python VocabularyBuilder.py -d "dataset" 'yelp_useful_tok.json' -p 
   ```
 #### 3. Encode the dataset
-**For all dataset:**
+**3.1 For all dataset:**
   ```sh
   python Encoder.py -d "dataset" 'yelp_review_tok.json' -p 
   ```
-**For training dataset:**
+**3.2 For training dataset:**
   ```sh
   python Encoder.py -d "dataset" 'yelp_useful_tok.json' -p 
   ```
+
+**3.3 For non-useless dataset:**
+  ```sh
+  python Encoder.py -d "dataset" 'non_useless_reviews.json' -p 
+  ```
 This step will generate encoded files for each review token.
 #### 4. Converte the encoded dataset to a numpy array
-**For all dataset:**
+**4.1 For all dataset:**
   ```sh
   python NpArrayConverter.py  -d "dataset" 'yelp_review_tok_enc.json'  
   ```
-**For training dataset:**
+**4.2 For training dataset:**
   ```sh
   python NpArrayConverter.py  -d "dataset" 'yelp_useful_tok_enc.json'  
   ```
-## Submitted files
-The files that are needed to submit are in "results/"
+**4.3 For non-useless dataset:**
+  ```sh
+  python NpArrayConverter.py  -o data_non_u.h5 -d "dataset" 'non_useless_reviews_enc.json'  
+  ```
+### Detailed Steps
+1. Tokenized the training dataset by  executing 1.2
+2. Build  the vovabulary by executing 2.2
+3. Encode the training dataset by executing 3.2
+4.  Train the model by executing "Trainer.py" and record threshold.
+5. Re-do Step **1 - 3** but use "all dataset".
+6. Convert the all dataset by executing 4.1
+7. Classify the  reviews by executing "Classifier.py"
+8. Re-do Step **1 - 3** but use "non-useless dataset".
+9. Convert the  non-useless dataset by executing 4.3
+10. Calculate the  silhouette coefficient by executing "Evaluater.py"   
+*Warning: this step takes a long time!*
+
+
+
+
+## Needed files
+The files that are needed to use for training and evaluating are in "dataset/"
 <table>
   <tr>
-    <th colspan="2" align="center">Submitted files list</th>
+    <th colspan="2" align="center">Needed files list</th>
   </tr>
   <tr>
     <th align="center"><strong>Content</strong></th>
     <th align="center"><strong>File Name</strong></th>
   </tr>
   <tr>
-    <td align="center">Top 500 words + counts for these words</td>
-    <td align="center">top_500_words_with_frequencies.txt</td>
+    <td align="center">All dataset</td>
+    <td align="center">yelp_review.json</td>
   </tr>
   <tr>
-    <td align="center">The top 5 words representing each cluster and their feature values</td>
-    <td align="center">top_5_centroids.txt</td>
+    <td align="center">Useful dataset</td>
+    <td align="center">yelp.useful.json</td>
+  </tr>
+ <tr>
+    <td align="center">Encoded all dataset's array</td>
+    <td align="center">data.h5</td>
+  </tr>
+  <tr>
+    <td align="center">Encoded non-useless array</td>
+    <td align="center">data_non_u.h5.json</td>
   </tr>
 </table>
 
+The remaining files are generated only as intermediate outputs.   
+*If you accidentally delete useful reviews, you can regenerate it using `UsefulReviewFilter.py`.*
 
-You can also use make to remove all intermediate files, leaving only the required files.
-  ```sh
-    make submit
-  ```
 ## Contact
 
 Aya -  yai104@syr.edu

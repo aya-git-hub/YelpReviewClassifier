@@ -5,66 +5,154 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 import numpy as np
+import matplotlib.pyplot as plt
+from joblib import dump
+from tqdm import tqdm
+from scipy.stats import norm
 
-# 如果没下载过 VADER 的词库需要先下载（只需运行一次）
-nltk.download('vader_lexicon')
+class Trainer:
+    def __init__(
+        self,
+        input_file: str,
+        model_output: str = 'model/rf.joblib',
+        limit: int = None,
+        test_size: float = 0.2,
+        random_state: int = 42,
+        n_estimators: int = 100
+    ):
+        nltk.download('vader_lexicon', quiet=True)
+        self.analyzer = SentimentIntensityAnalyzer()
+        self.input_file = input_file
+        self.model_output = model_output
+        self.limit = limit
+        self.test_size = test_size
+        self.random_state = random_state
+        self.n_estimators = n_estimators
 
-# 初始化情感分析器
-analyzer = SentimentIntensityAnalyzer()
+    def load_data(self):
+        print(f"Starting to load reviews(most: {self.limit or 'all'} ...")
+        features, targets = [], []
+        total = self.limit
+        with open(self.input_file, 'r', encoding='utf-8') as f:
+            for i, line in enumerate(tqdm(f, desc="Loading data", total=total, unit="行")):
+                if self.limit is not None and i >= self.limit:
+                    break
+                data = json.loads(line)
+                review_text = " ".join(data.get("text", []))
+                score = self.analyzer.polarity_scores(review_text)
+                features.append([score["compound"], score["pos"], score["neu"], score["neg"]])
+                targets.append(data.get("stars", 0))
+        self.X = np.array(features)
+        self.y = np.array(targets)
+        print(f"Finish data loading, totally {len(self.y)} reviews。\n")
 
-# 文件路径（请根据实际情况调整）
-input_file = "dataset/yelp_useful_tok.json"
+        print("dividing training set and test set...")
+        self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+            self.X, self.y, test_size=self.test_size, random_state=self.random_state
+        )
+        print(f"Training:{len(self.y_train)} ，Test:{len(self.y_test)} .\n")
 
-# 列表用于存储特征和目标值
-features = []
-targets = []
+    def train(self):
+        print(f"Starting Random Forset, totally {self.n_estimators} trees)…")
+        self.model = RandomForestRegressor(
+            n_estimators=self.n_estimators,
+            random_state=self.random_state,
+            verbose=1
+        )
+        self.model.fit(self.X_train, self.y_train)
+        dump(self.model, self.model_output)
+        print(f"Finish training, model has been saved to {self.model_output}\n")
 
-# 可选择限制读取行数（例如：10000 行）
-limit = None  # 若为 None，则全部读取；否则可以设置为一个整数，例如 10000
+    def evaluate(self):
+        print("Calculating MAE…")
+        self.y_pred = self.model.predict(self.X_test)
+        self.mae = mean_absolute_error(self.y_test, self.y_pred)
+        print(f"Test set: MAE: {self.mae:.3f}\n")
 
-# 读取文件，逐行提取情感特征和评分
-with open(input_file, 'r', encoding='utf-8') as f:
-    for i, line in enumerate(f):
-        if limit is not None and i >= limit:
-            break
+    def plot_error_distribution(self, a=0.8, tol=1e-6, max_iter=100):
 
-        data = json.loads(line)
-        # 将 token 列表还原为一句话（各单词之间空格分隔）
-        tokens = data.get("text", [])
-        review_text = " ".join(tokens)
 
-        # 利用 VADER 得到情感分数
-        score = analyzer.polarity_scores(review_text)
-        # 构造特征向量：我们这里使用 compound, pos, neu, neg 四个分数
-        feature_vector = [
-            score["compound"],
-            score["pos"],
-            score["neu"],
-            score["neg"]
-        ]
-        features.append(feature_vector)
+        errors = self.y_test - self.y_pred
+        mu_err = errors.mean()
+        sigma_err = errors.std()
+        u = self.mae
 
-        # 目标值：这里使用评论中的 stars 字段，假设已经是 0-5 的评分
-        targets.append(data.get("stars", 0))
 
-# 转换为 numpy 数组
-X = np.array(features)
-y = np.array(targets)
+        plt.figure()
+        plt.hist(errors, bins=30, density=True, alpha=0.6, label="Error Histogram")
+        x_vals = np.linspace(errors.min(), errors.max(), 200)
+        pdf_vals = norm.pdf(x_vals, loc=mu_err, scale=sigma_err)
+        plt.plot(x_vals, pdf_vals,
+                 label=f"Normal PDF (μ={mu_err:.3f}, σ={sigma_err:.3f})")
+        plt.xlabel("Error (y_test - y_pred)")
+        plt.ylabel("Density")
+        plt.title("Error Distribution with Fitted Normal Curve")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
-# 划分训练集与验证集（例如80%训练，20%验证）
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        # 3. 牛顿法：解 Φ((u+x−μ)/σ) − Φ((u−x−μ)/σ) = a
+        def f(x):
+            return ( norm.cdf((u + x - mu_err) / sigma_err)
+                   - norm.cdf((u -   x - mu_err) / sigma_err)
+                   - a )
+        def df(x):
+            return ( norm.pdf((u + x - mu_err) / sigma_err)
+                   + norm.pdf((u -   x - mu_err) / sigma_err)
+                   ) / sigma_err
 
-# 使用随机森林回归
-rf = RandomForestRegressor(n_estimators=100, random_state=42)
-rf.fit(X_train, y_train)
+        x = sigma_err
+        for _ in range(max_iter):
+            fx  = f(x)
+            dfx = df(x)
+            x_new = x - fx / dfx
+            if abs(x_new - x) < tol:
+                x = x_new
+                break
+            x = x_new
 
-# 在验证集上进行预测
-y_pred = rf.predict(X_test)
+        print(f"For a={a*100:.1f}% coverage around MAE, threshold x ≈ {x:.3f}")
+        print(f"Interval: [{u - x:.3f}, {u + x:.3f}]")
 
-# 计算平均误差（这里采用平均绝对误差 MAE）
-mae = mean_absolute_error(y_test, y_pred)
-print(f"验证集上平均绝对误差: {mae:.3f}")
+        # 验证实际覆盖率
+        coverage = ( norm.cdf((u + x - mu_err)/sigma_err)
+                   - norm.cdf((u -   x - mu_err)/sigma_err) )
+        print(f"Actual coverage: {coverage:.4f}\n")
 
-# 输出部分预测结果对比
-for i in range(min(10, len(y_test))):
-    print(f"实际评分: {y_test[i]}, 预测评分: {y_pred[i]:.2f}")
+    def plot_random_forest(self, feature_index=0, resolution=0.01):
+        x_min, x_max = self.X_test[:, feature_index].min(), self.X_test[:, feature_index].max()
+        x_grid = np.arange(x_min, x_max, resolution)
+        mean_vector = self.X_train.mean(axis=0)
+        X_grid = np.tile(mean_vector, (len(x_grid), 1))
+        X_grid[:, feature_index] = x_grid
+        y_grid = self.model.predict(X_grid)
+
+        plt.figure()
+        plt.scatter(self.X_test[:, feature_index], self.y_test,
+                    alpha=0.6, label="Actual (test)")
+        plt.plot(x_grid, y_grid, linewidth=2, label="RF Prediction slice")
+        plt.xlabel(f"Feature #{feature_index}")
+        plt.ylabel("Stars")
+        plt.title(f"Random Forest on Feature {feature_index}")
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+    def run(self):
+        self.load_data()
+        self.train()
+        self.evaluate()
+        # a = 50%
+        self.plot_error_distribution(a=0.5)
+
+
+if __name__ == "__main__":
+    trainer = Trainer(
+        input_file="dataset/yelp_usefulw_tok.json",
+        model_output="model/rf.joblib",
+        limit=None,
+        test_size=0.2,
+        random_state=42,
+        n_estimators=100
+    )
+    trainer.run()
